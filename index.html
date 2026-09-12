@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinguaFlow HCI — Interactive Language Learning & Database Studio</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Custom CSS with 3D Flip, Transitions, and HCI Focus States -->
+  <link rel="stylesheet" href="styles.css?v=20260912" />
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-900 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <header class="glass-nav sticky top-0 z-40 border-b border-slate-200/80 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Project Tag -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="showScreen('screen-learn')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+          <span class="text-xl font-black">L</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-lg font-black tracking-tight text-slate-900">Lingua<span class="text-indigo-600">Flow</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav id="app-navigation" class="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200/60 text-xs font-semibold">
+        <button class="nav-btn px-3.5 py-1.5 rounded-lg transition-all" data-screen="screen-learn" onclick="showScreen('screen-learn')">
+          🏠 Home
+        </button>
+        <button class="nav-btn px-3.5 py-1.5 rounded-lg transition-all" data-screen="screen-flashcards" onclick="showScreen('screen-flashcards')">
+          🗂️ Flashcards
+        </button>
+        <button class="nav-btn px-3.5 py-1.5 rounded-lg transition-all" data-screen="screen-quiz" onclick="showScreen('screen-quiz')">
+          🎯 Quiz Arena
+        </button>
+        <button class="nav-btn px-3.5 py-1.5 rounded-lg transition-all" data-screen="screen-match" onclick="showScreen('screen-match')">
+          🧩 Match Game
+        </button>
+        <button class="nav-btn px-3.5 py-1.5 rounded-lg transition-all" data-screen="screen-profile" onclick="showScreen('screen-profile')">
+          👤 Profile
+        </button>
+        <button class="nav-btn px-3.5 py-1.5 rounded-lg transition-all bg-indigo-600 text-white font-bold shadow-sm hover:bg-indigo-700" data-screen="screen-database" onclick="showScreen('screen-database')">
+          🗄️ Database Console
+        </button>
+      </nav>
+
+      <!-- Right Header Actions (Language badge and Live DB Indicator) -->
+      <div id="header-app-actions" class="flex items-center gap-2 sm:gap-3">
+        
+        <!-- Live Database Sync Pulse (HCI: Visibility of System Status) -->
+        <div id="db-sync-pulse" class="opacity-0 transition-opacity duration-300 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold" title="Live Database Activity Synchronized">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          <span class="hidden sm:inline">DB Synced</span>
+        </div>
+
+        <!-- Login / Guest Access -->
+        <button onclick="showScreen('screen-auth')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-all shadow-sm" title="Sign In or Continue as Guest">
+          <span>🔐</span>
+          <span>Login / Guest</span>
+        </button>
+      </div>
+
+    </div>
+
+    <div id="mobile-app-navigation" class="md:hidden px-4 pb-3 bg-white border-t border-slate-100">
+      <label for="mobile-screen-nav" class="sr-only">Choose app section</label>
+      <select id="mobile-screen-nav" onchange="showScreen(this.value)" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-700">
+        <option value="screen-learn">Home</option>
+        <option value="screen-flashcards">Flashcards</option>
+        <option value="screen-quiz">Quiz Arena</option>
+        <option value="screen-match">Match Game</option>
+        <option value="screen-profile">Profile</option>
+        <option value="screen-database">Database Console</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- ==================== SCREEN 1: HOME (DASHBOARD) ==================== -->
+    <section id="screen-learn" class="app-screen">
+      
+      <!-- Welcome Hero Card -->
+      <div class="rounded-2xl bg-indigo-900 text-white p-6 sm:p-8 shadow-sm mb-6">
+        <div class="relative z-10 max-w-2xl">
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
+            Welcome, <span id="dash-welcome-name" class="text-indigo-300">Guest Evaluator</span>!
+          </h1>
+          <p class="text-indigo-100/90 text-sm leading-relaxed mb-5">
+            Build vocabulary with flashcards, quizzes, pronunciation, and progress tracking.
+          </p>
+        </div>
+      </div>
+
+      <!-- Live User Stats Grid (HCI: Visibility of System Status) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center text-2xl font-bold">
+            🔥
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate-500">Day Streak</div>
+            <div id="header-user-streak" class="text-xl font-extrabold text-slate-800">4 Days</div>
+          </div>
+        </div>
+
+        <div class="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center text-2xl font-bold">
+            ⚡
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate-500">Experience Points</div>
+            <div id="header-user-xp" class="text-xl font-extrabold text-indigo-600">420 XP</div>
+          </div>
+        </div>
+
+        <div class="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center text-2xl font-bold">
+            🌍
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate-500">Focus Language</div>
+            <div id="dash-lang-title" class="text-xl font-extrabold text-slate-800">Spanish</div>
+          </div>
+        </div>
+
+        <div class="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-violet-50 border border-violet-200 text-violet-600 flex items-center justify-center text-2xl font-bold">
+            📚
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate-500">Vocabulary Bank</div>
+            <div id="dash-vocab-count" class="text-xl font-extrabold text-slate-800">18 Words</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-3 mb-8">
+        <button onclick="showScreen('screen-flashcards')" class="quick-action-card text-left p-5 rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white hover:border-indigo-300 hover:shadow-md transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <span class="w-11 h-11 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-sm">🗂️</span>
+            <span class="text-xs font-bold text-indigo-600">Quick start</span>
+          </div>
+          <h3 class="text-lg font-black text-slate-900 mb-1">Learn with flashcards</h3>
+          <p class="text-sm text-slate-600">Revise high-frequency words and build confidence through active recall.</p>
+        </button>
+
+        <button onclick="showScreen('screen-quiz')" class="quick-action-card text-left p-5 rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white hover:border-emerald-300 hover:shadow-md transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <span class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xl shadow-sm">🎯</span>
+            <span class="text-xs font-bold text-emerald-600">Challenge</span>
+          </div>
+          <h3 class="text-lg font-black text-slate-900 mb-1">Take a quiz</h3>
+          <p class="text-sm text-slate-600">Check retention and improve speed with adaptive language practice.</p>
+        </button>
+
+        <button onclick="showScreen('screen-languages')" class="quick-action-card text-left p-5 rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 to-white hover:border-violet-300 hover:shadow-md transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <span class="w-11 h-11 rounded-xl bg-violet-600 text-white flex items-center justify-center text-xl shadow-sm">🌍</span>
+            <span class="text-xs font-bold text-violet-600">Language</span>
+          </div>
+          <h3 class="text-lg font-black text-slate-900 mb-1">Choose a language</h3>
+          <p class="text-sm text-slate-600">Switch tracks instantly and keep the learning flow consistent.</p>
+        </button>
+      </div>
+
+      <div class="grid gap-4 lg:grid-cols-[1.35fr_1fr] mb-8">
+        <div class="p-5 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white shadow-sm">
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <span class="text-xs font-black uppercase tracking-wider text-amber-700">Daily Challenge</span>
+              <h2 id="daily-challenge-title" class="text-xl font-black text-slate-900 mt-1">Learn 5 new words</h2>
+              <p id="daily-challenge-description" class="text-sm text-slate-600 mt-1">Complete one focused activity today.</p>
+            </div>
+            <span class="text-3xl">🏅</span>
+          </div>
+          <div class="h-2 bg-amber-100 rounded-full overflow-hidden mb-3">
+            <div id="daily-challenge-progress" class="h-full bg-amber-500 rounded-full transition-all" style="width: 0%"></div>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <span id="daily-challenge-status" class="text-xs font-bold text-amber-800">0 / 5 completed</span>
+            <button id="daily-challenge-action" onclick="startDailyChallenge()" class="px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black transition-all">Start Challenge</button>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <span class="text-xs font-black uppercase tracking-wider text-slate-500">Achievements</span>
+              <h2 class="text-xl font-black text-slate-900 mt-1">Your learning wins</h2>
+            </div>
+            <span class="text-2xl">🏆</span>
+          </div>
+          <div id="achievement-list" class="grid grid-cols-3 gap-2"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== SCREEN 2: INTERACTIVE 3D FLASHCARDS ==================== -->
+    <section id="screen-flashcards" class="app-screen hidden">
+      
+      <!-- Top Action Bar -->
+      <div class="flex items-center justify-between mb-6">
+        <button onclick="showScreen('screen-learn')" class="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-indigo-600 transition-colors">
+          <span>&larr; Back to Home</span>
+        </button>
+        <div class="flex items-center gap-3">
+          <span id="flashcard-counter" class="text-xs font-bold text-slate-500">Card 1 of 6</span>
+          <button onclick="showScreen('screen-database')" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline">
+            View in Database
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress Stepper Bar -->
+      <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden mb-8">
+        <div id="flashcard-progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 20%;"></div>
+      </div>
+
+      <!-- 3D Flashcard Stage -->
+      <div class="max-w-lg mx-auto mb-8 perspective-1000">
+        <div id="flashcard-inner" class="flashcard-inner h-80 select-none shadow-xl rounded-2xl" onclick="flipCard()">
+          
+          <!-- FRONT OF CARD -->
+          <div class="flashcard-front bg-white border border-slate-200 p-8 shadow-sm">
+            <div class="flex items-center justify-between w-full mb-auto">
+              <span id="card-lang-front" class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">Kannada</span>
+              <span id="card-category-front" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">Greetings</span>
+            </div>
+
+            <div class="text-center my-auto">
+              <h2 id="card-word-front" class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mb-2">ನಮಸ್ಕಾರ (Namaskara)</h2>
+              <p id="card-phonetic-front" class="text-sm font-mono text-indigo-600 mb-4">/nah-mas-KAH-rah/</p>
+              
+              <!-- Speech Pronunciation Button (Multimodal HCI) -->
+              <button onclick="playCardAudio(event)" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 transition-all">
+                <span>🔊 Listen Pronunciation</span>
+                <span id="flashcard-audio-anim" class="hidden">
+                  <span class="audio-bar"></span>
+                  <span class="audio-bar"></span>
+                  <span class="audio-bar"></span>
+                </span>
+              </button>
+            </div>
+
+            <div class="w-full text-center mt-auto text-xs text-slate-400">
+              💡 Tap card or press <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded font-mono text-[10px]">Space</kbd> to flip
+            </div>
+          </div>
+
+          <!-- BACK OF CARD -->
+          <div class="flashcard-back bg-gradient-to-br from-indigo-600 to-indigo-800 text-white p-8 shadow-md">
+            <div class="flex items-center justify-between w-full mb-auto">
+              <span class="px-2.5 py-1 rounded-full bg-white/20 text-white text-xs font-semibold">Meaning / Translation</span>
+              <span id="card-mastery-back" class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-bold border border-emerald-400/30">Mastery: 85%</span>
+            </div>
+
+            <div class="text-center my-auto">
+              <p class="text-xs text-indigo-200 uppercase tracking-wider font-semibold mb-1">English Translation</p>
+              <h3 id="card-translation-back" class="text-3xl sm:text-4xl font-black mb-3">Hello / Greetings</h3>
+              <p id="card-word-back" class="text-indigo-200 text-sm italic">"ನಮಸ್ಕಾರ"</p>
+            </div>
+
+            <div class="w-full text-center mt-auto text-xs text-indigo-200/80">
+              💡 Rate your recall confidence below to update database
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tactile Confidence Rating Controls (Fitts's Law: Large Touch Targets) -->
+      <div class="max-w-lg mx-auto">
+        <p class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
+          Rate Confidence (Saved to Database)
+        </p>
+        <div class="grid grid-cols-3 gap-3">
+          <button onclick="rateCardConfidence('hard')" class="p-3.5 rounded-xl bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 font-bold text-xs text-center transition-all shadow-sm interactive-press">
+            <div class="text-lg mb-0.5">🔴</div>
+            <div>Hard</div>
+            <div class="text-[10px] text-slate-400 font-normal">+2 XP • [1]</div>
+          </button>
+          <button onclick="rateCardConfidence('medium')" class="p-3.5 rounded-xl bg-white border border-amber-200 hover:bg-amber-50 text-amber-700 font-bold text-xs text-center transition-all shadow-sm interactive-press">
+            <div class="text-lg mb-0.5">🟡</div>
+            <div>Medium</div>
+            <div class="text-[10px] text-slate-400 font-normal">+5 XP • [2]</div>
+          </button>
+          <button onclick="rateCardConfidence('easy')" class="p-3.5 rounded-xl bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 font-bold text-xs text-center transition-all shadow-sm interactive-press">
+            <div class="text-lg mb-0.5">🟢</div>
+            <div>Easy</div>
+            <div class="text-[10px] text-slate-400 font-normal">+10 XP • [3]</div>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between mt-6 pt-4 border-t border-slate-200 text-xs">
+          <button onclick="prevCard()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 font-semibold text-slate-700">
+            &larr; Previous Card
+          </button>
+          <button onclick="flipCard()" class="px-4 py-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 font-bold text-indigo-700">
+            Flip Card (Space)
+          </button>
+          <button onclick="nextCard()" class="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 font-semibold text-slate-700">
+            Next Card &rarr;
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== SCREEN 3: INTERACTIVE SPEED QUIZ ==================== -->
+    <section id="screen-quiz" class="app-screen hidden">
+      
+      <!-- Top Action Bar -->
+      <div class="flex items-center justify-between mb-6">
+        <button onclick="showScreen('screen-learn')" class="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-indigo-600 transition-colors">
+          <span>&larr; Back to Home</span>
+        </button>
+        <span class="text-xs font-bold text-indigo-600">🎯 Multimodal Feedback Challenge</span>
+      </div>
+
+      <!-- Progress Stepper -->
+      <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden mb-8">
+        <div id="quiz-stepper-progress" class="bg-emerald-500 h-2 rounded-full transition-all duration-300" style="width: 25%;"></div>
+      </div>
+
+      <!-- QUIZ CARD -->
+      <div id="quiz-question-card" class="max-w-xl mx-auto bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <span id="quiz-question-number" class="text-xs font-bold uppercase tracking-wider text-slate-400">Question 1 of 4</span>
+          <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">+25 XP per correct</span>
+        </div>
+
+        <h3 id="quiz-question-prompt" class="text-base sm:text-lg font-semibold text-slate-700 mb-4">
+          What is the meaning of this word?
+        </h3>
+
+        <!-- Word Highlight -->
+        <div class="bg-indigo-50/70 rounded-2xl p-6 text-center mb-6 border border-indigo-100">
+          <span id="quiz-word-display" class="text-3xl sm:text-4xl font-black text-indigo-950 block mb-1">ನಮಸ್ಕಾರ (Namaskara)</span>
+          <span id="quiz-phonetic-display" class="text-xs font-mono text-indigo-600">/nah-mas-KAH-rah/</span>
+        </div>
+
+        <!-- 4 Options (Hick's Law: 4 Options to Minimize Decision Time) -->
+        <div id="quiz-options-grid" class="space-y-3">
+          <!-- Dynamically populated by app.js -->
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-slate-100 text-center text-xs text-slate-400">
+          💡 Answers instantly log your response accuracy and score to the database.
+        </div>
+      </div>
+
+      <!-- QUIZ RESULTS CARD (Shown on finish) -->
+      <div id="quiz-result-card" class="hidden max-w-lg mx-auto bg-white rounded-3xl border border-slate-200 p-8 text-center shadow-xl">
+        <div class="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 text-4xl flex items-center justify-center mx-auto mb-4 animate-bounce">
+          🏆
+        </div>
+        <h2 class="text-2xl font-black text-slate-900 mb-1">Challenge Completed!</h2>
+        <p class="text-xs text-slate-500 mb-6">Your results have been automatically recorded in the activity logs.</p>
+
+        <div class="grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl mb-6">
+          <div>
+            <div class="text-xs text-slate-500 font-medium">XP Earned</div>
+            <div id="quiz-final-score" class="text-2xl font-extrabold text-indigo-600">100 XP</div>
+          </div>
+          <div>
+            <div class="text-xs text-slate-500 font-medium">Accuracy</div>
+            <div id="quiz-final-accuracy" class="text-2xl font-extrabold text-emerald-600">100%</div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button onclick="initQuiz()" class="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 transition-colors">
+            Try Again
+          </button>
+          <button onclick="showScreen('screen-database')" class="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-colors">
+            Inspect in Database &rarr;
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== SCREEN 4: VOCABULARY MATCHING GAME ==================== -->
+    <section id="screen-match" class="app-screen hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-black text-slate-900">Vocabulary Match Game</h2>
+          <p class="text-xs text-slate-500 mt-1">Pair each word with its meaning to strengthen recall.</p>
+        </div>
+        <button onclick="showScreen('screen-learn')" class="text-xs font-bold text-slate-600 hover:text-indigo-600">&larr; Back to Hub</button>
+      </div>
+      <div class="max-w-2xl mx-auto bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-lg">
+        <div class="flex items-center justify-between mb-5">
+          <span id="match-round-label" class="text-xs font-bold uppercase tracking-wider text-slate-400">Round 1 of 5 · 3 pairs</span>
+          <span id="match-score-label" class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold">0 pairs matched</span>
+        </div>
+        <div id="match-board" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+        <div id="match-complete-panel" class="hidden text-center mt-6 p-5 rounded-2xl bg-emerald-50 border border-emerald-200">
+          <div class="text-3xl mb-2">🎉</div>
+          <h3 class="font-black text-emerald-900">Round complete!</h3>
+          <p id="match-complete-text" class="text-xs text-emerald-700 mt-1">Great recall.</p>
+          <div class="flex flex-wrap justify-center gap-2 mt-4">
+            <button id="match-next-round-btn" onclick="nextMatchRound()" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold">Next Round &rarr;</button>
+            <button id="match-restart-btn" onclick="initMatchGame()" class="hidden px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">Play Again</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SCREEN 4: LANGUAGE SELECTION HUB ==================== -->
+    <section id="screen-languages" class="app-screen hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-black text-slate-900">Choose Your Learning Language</h2>
+          <p class="text-xs text-slate-500 mt-1">Select a language to switch your lessons, flashcard deck, and database tracking.</p>
+        </div>
+        <button onclick="showScreen('screen-learn')" class="text-xs font-bold text-slate-600 hover:text-indigo-600">
+          &larr; Back to Hub
+        </button>
+      </div>
+
+      <!-- Languages Grid (Populated dynamically) -->
+      <div id="languages-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Injected by app.js -->
+      </div>
+    </section>
+
+    <!-- ==================== SCREEN 5: USER PROFILE & SETTINGS ==================== -->
+    <section id="screen-profile" class="app-screen hidden">
+      <div class="max-w-2xl mx-auto">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-black text-slate-900">Learner Profile & Preferences</h2>
+          <button onclick="showScreen('screen-learn')" class="text-xs font-bold text-slate-600 hover:text-indigo-600">
+            &larr; Back to Hub
+          </button>
+        </div>
+
+        <!-- Profile Form Card -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm mb-6">
+          
+          <!-- Avatar Selector -->
+          <div class="flex items-center gap-5 mb-8 pb-6 border-b border-slate-100">
+            <div id="profile-avatar-display" class="w-20 h-20 rounded-2xl bg-indigo-50 border-2 border-indigo-200 flex items-center justify-center text-4xl shadow-inner select-none">
+              👨‍🎓
+            </div>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Choose Avatar</span>
+                <span id="profile-role-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Guest Evaluator</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="selectAvatar('👨‍🎓')" class="w-9 h-9 rounded-lg bg-slate-100 hover:bg-indigo-100 text-xl flex items-center justify-center transition-colors">👨‍🎓</button>
+                <button type="button" onclick="selectAvatar('👩‍💻')" class="w-9 h-9 rounded-lg bg-slate-100 hover:bg-indigo-100 text-xl flex items-center justify-center transition-colors">👩‍💻</button>
+                <button type="button" onclick="selectAvatar('👨‍🏫')" class="w-9 h-9 rounded-lg bg-slate-100 hover:bg-indigo-100 text-xl flex items-center justify-center transition-colors">👨‍🏫</button>
+                <button type="button" onclick="selectAvatar('🌟')" class="w-9 h-9 rounded-lg bg-slate-100 hover:bg-indigo-100 text-xl flex items-center justify-center transition-colors">🌟</button>
+                <button type="button" onclick="selectAvatar('🚀')" class="w-9 h-9 rounded-lg bg-slate-100 hover:bg-indigo-100 text-xl flex items-center justify-center transition-colors">🚀</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Fields -->
+          <form onsubmit="saveProfileChanges(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Display Name</label>
+              <input id="profile-name-input" type="text" required class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Email Address</label>
+              <input id="profile-email-input" type="email" required class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Bio / Notes</label>
+              <textarea id="profile-bio-input" rows="2" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Daily Study Goal</label>
+                <select id="profile-goal-select" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-800">
+                  <option value="5">Casual (5 mins / day)</option>
+                  <option value="15">Regular (15 mins / day)</option>
+                  <option value="30">Intensive (30 mins / day)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Active Focus Language</label>
+                <div class="w-full p-3 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-600 font-semibold flex items-center justify-between">
+                  <span id="profile-lang-focus">Spanish</span>
+                  <button type="button" onclick="showScreen('screen-languages')" class="text-xs text-indigo-600 hover:underline">Change</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-4 flex items-center justify-end gap-3">
+              <button type="button" onclick="showScreen('screen-auth')" class="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800">
+                Log Out / Switch User
+              </button>
+              <button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-colors">
+                Save Profile to Database
+              </button>
+            </div>
+          </form>
+
+        </div>
+
+        <!-- Lifetime Stats Card -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+          <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">Learner Statistics</h3>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <div id="profile-stat-streak" class="text-xl font-black text-amber-600">4 Days</div>
+              <div class="text-[11px] text-slate-400 font-medium">Day Streak</div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <div id="profile-stat-xp" class="text-xl font-black text-indigo-600">420 XP</div>
+              <div class="text-[11px] text-slate-400 font-medium">Lifetime XP</div>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <div id="profile-stat-words" class="text-xl font-black text-emerald-600">18 Words</div>
+              <div class="text-[11px] text-slate-400 font-medium">Mastered</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== SCREEN 6: DATABASE STUDIO / CONSOLE (PROFESSOR'S CORE REQUIREMENT) ==================== -->
+    <section id="screen-database" class="app-screen hidden">
+      
+      <!-- Console Header -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-2xl font-black text-slate-900">🗄️ Real-Time Database Studio</h2>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+              CRUD Enabled
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">
+            Every learning action is saved here. You can <strong>edit records in-place, delete, add new items, or export to CSV/JSON</strong>.
+          </p>
+        </div>
+
+        <!-- Quick Export & Reset Actions -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="window.db.exportTableToCSV(state.activeDbTab)" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5" title="Download active table as CSV (Excel)">
+            <span>📥 Export to CSV</span>
+          </button>
+          <button onclick="window.db.exportAllToJSON()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5" title="Export entire database as JSON">
+            <span>💾 Export Full DB (JSON)</span>
+          </button>
+          <button onclick="openAddWordModal()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5">
+            <span>➕ Add Word</span>
+          </button>
+          <button onclick="resetAllDatabaseData()" class="px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-colors" title="Reset all tables to initial seed values">
+            <span>🔄 Reset Data</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Database Controls Bar (Search & Filter) -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 mb-6 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+        
+        <!-- Table Tabs -->
+        <div class="flex items-center gap-2 border-b sm:border-b-0 border-slate-200 w-full sm:w-auto pb-2 sm:pb-0">
+          <button class="db-tab-btn px-4 py-2 text-xs border-b-2 border-indigo-600 text-indigo-600 font-bold transition-colors" data-table="activity_logs" onclick="switchDatabaseTab('activity_logs')">
+            Activity Logs
+          </button>
+          <button class="db-tab-btn px-4 py-2 text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-colors" data-table="vocabulary" onclick="switchDatabaseTab('vocabulary')">
+            Vocabulary Bank
+          </button>
+          <button class="db-tab-btn px-4 py-2 text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-colors" data-table="users" onclick="switchDatabaseTab('users')">
+            Users & Profiles
+          </button>
+        </div>
+
+        <!-- Search & Filter Inputs -->
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <div class="relative flex-1 sm:w-64">
+            <input 
+              type="text" 
+              placeholder="Search table records..." 
+              oninput="handleDbSearch(event)"
+              class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:bg-white focus:border-indigo-500"
+            />
+            <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔍</span>
+          </div>
+
+          <select onchange="handleDbLangFilter(event)" class="py-1.5 px-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-700">
+            <option value="All">All Languages</option>
+            <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
+            <option value="Hindi">Hindi (हिन्दी)</option>
+            <option value="English">English</option>
+            <option value="Tamil">Tamil (தமிழ்)</option>
+            <option value="Telugu">Telugu (తెలుగు)</option>
+            <option value="Malayalam">Malayalam (മലയാളം)</option>
+            <option value="Marathi">Marathi (मराठी)</option>
+            <option value="Bengali">Bengali (বাংলা)</option>
+            <option value="Gujarati">Gujarati (ગુજરાતી)</option>
+            <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+            <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
+            <option value="Urdu">Urdu (اردو)</option>
+            <option value="Sanskrit">Sanskrit (संस्कृतम्)</option>
+            <option value="Assamese">Assamese (অসমীয়া)</option>
+            <option value="Spanish">Spanish</option>
+            <option value="French">French</option>
+            <option value="German">German</option>
+            <option value="Japanese">Japanese</option>
+            <option value="Italian">Italian</option>
+          </select>
+          
+          <span id="db-records-count" class="text-xs font-bold text-slate-500 whitespace-nowrap">
+            <!-- Count injected -->
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Data Table Container -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div id="db-table-content" class="overflow-x-auto custom-scrollbar max-h-[550px]">
+          <!-- Table dynamically injected by app.js -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== SCREEN 7: AUTHENTICATION / LOGIN ==================== -->
+    <section id="screen-auth" class="app-screen hidden">
+      <div class="max-w-xl mx-auto my-6">
+        
+        <!-- Back Link -->
+        <button onclick="showScreen('screen-learn')" class="mb-4 text-xs font-bold text-slate-600 hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
+          <span>&larr; Back to Home</span>
+        </button>
+
+        <!-- Main Auth Card -->
+        <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-10 shadow-2xl">
+          
+          <!-- Logo & Header -->
+          <div class="text-center mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white font-black text-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-indigo-500/25">
+              L
+            </div>
+            <h2 id="auth-main-title" class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Welcome to LinguaFlow</h2>
+            <p id="auth-main-subtitle" class="text-xs sm:text-sm text-slate-500 mt-1.5">Sign in to sync your language journey & database logs</p>
+          </div>
+
+          <!-- Social Login Options -->
+          <div class="space-y-2 mb-5">
+            <button type="button" onclick="openGoogleOAuthModal()" class="w-full py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors">
+              <svg class="inline-block w-4 h-4 mr-2 align-text-bottom" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>Continue with Google / Gmail
+            </button>
+            <button type="button" onclick="openFacebookOAuthModal()" class="w-full py-2.5 rounded-lg bg-[#1877F2] hover:bg-[#166fe5] text-white text-sm font-semibold transition-colors">
+              <svg class="inline-block w-4 h-4 mr-2 align-text-bottom fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.073C24 5.446 18.627.073 12 .073S0 5.446 0 12.073c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>Continue with Facebook
+            </button>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="simulateOAuthLogin('Apple', 'apple.user@icloud.com', 'Apple Learner', '🍏')" class="py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors">
+                <svg class="inline-block w-4 h-4 mr-1.5 align-text-bottom fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8.92-2.87-.9.04-2 .6-2.65 1.36-.58.68-.97 1.74-.84 2.78.99.08 1.95-.52 2.57-1.27z"/></svg>Apple ID
+              </button>
+              <button type="button" onclick="simulateOAuthLogin('GitHub', 'developer@github.com', 'GitHub Coder', '💻')" class="py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-colors">
+                <svg class="inline-block w-4 h-4 mr-1.5 align-text-bottom fill-current" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>GitHub
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 mb-5 text-xs text-slate-400">
+            <span class="flex-1 border-t border-slate-200"></span>
+            <span>OR USE EMAIL OR PHONE</span>
+            <span class="flex-1 border-t border-slate-200"></span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl mb-5" role="tablist" aria-label="Sign-in method">
+            <button type="button" id="auth-method-email" onclick="switchAuthMethod('email')" class="py-2 rounded-lg bg-white text-indigo-700 shadow-sm text-xs font-bold" role="tab" aria-selected="true">Email & Password</button>
+            <button type="button" id="auth-method-phone" onclick="switchAuthMethod('phone')" class="py-2 rounded-lg text-slate-500 text-xs font-bold" role="tab" aria-selected="false">Phone OTP</button>
+          </div>
+
+          <!-- Auth Mode Tabs (Sign In vs Register) -->
+          <div class="flex items-center p-1 bg-slate-100 rounded-xl mb-6">
+            <button 
+              type="button" 
+              id="auth-tab-signin" 
+              onclick="switchAuthTab('signin')" 
+              class="flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white text-indigo-700 shadow-sm"
+            >
+              Sign In
+            </button>
+            <button 
+              type="button" 
+              id="auth-tab-register" 
+              onclick="switchAuthTab('register')" 
+              class="flex-1 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-800"
+            >
+              Create Account
+            </button>
+          </div>
+
+          <!-- Real-Time Error & Success Banners -->
+          <div id="auth-error-banner" class="hidden mb-4 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2.5">
+            <span class="text-base">⚠️</span>
+            <span id="auth-error-text">Please check your email and password.</span>
+          </div>
+
+          <div id="auth-success-banner" class="hidden mb-4 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2.5">
+            <span class="text-base">✓</span>
+            <span id="auth-success-text">Account created successfully!</span>
+          </div>
+
+          <!-- Email & Password Form -->
+          <form onsubmit="handleEmailAuthFormSubmit(event)" autocomplete="off" class="space-y-4">
+            
+            <!-- Name field (shown only in Register mode) -->
+            <div id="auth-name-container" class="hidden">
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Full Name</label>
+              <input 
+                id="auth-name-input" 
+                type="text" 
+                placeholder="Enter your full name" 
+                class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
+              />
+            </div>
+
+            <!-- Email field -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Email Address</label>
+              <input 
+                id="auth-email-input" 
+                type="email" 
+                autocomplete="off"
+                placeholder="youremail@gmail.com" 
+                required 
+                class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
+              />
+            </div>
+
+            <!-- Password field with Show/Hide Eye Toggle -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-700 uppercase">Password</label>
+                <button type="button" id="auth-forgot-link" onclick="openForgotPasswordModal()" class="text-xs text-indigo-600 hover:underline font-semibold">
+                  Forgot password?
+                </button>
+              </div>
+              <div class="relative">
+                <input 
+                  id="auth-password-input" 
+                  type="password" 
+                  autocomplete="new-password"
+                  placeholder="Enter your password" 
+                  required 
+                  oninput="updatePasswordStrength(this.value)"
+                  class="w-full p-3 pr-10 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
+                />
+                <button 
+                  type="button" 
+                  onclick="togglePasswordVisibility('auth-password-input', this)" 
+                  class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 text-sm"
+                  title="Toggle password visibility"
+                >
+                  👁️
+                </button>
+              </div>
+
+              <!-- Password Strength Bar (Visible in register mode) -->
+              <div id="auth-password-meter" class="hidden mt-2">
+                <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                  <div id="password-strength-bar" class="bg-rose-500 h-1.5 rounded-full transition-all" style="width: 25%;"></div>
+                </div>
+                <div id="password-strength-text" class="text-[10px] text-slate-500 font-semibold mt-1">Password strength: Weak (min 6 chars)</div>
+              </div>
+            </div>
+
+            <!-- Confirm Password field (shown only in Register mode) -->
+            <div id="auth-confirm-container" class="hidden">
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Confirm Password</label>
+              <div class="relative">
+                <input 
+                  id="auth-confirm-password-input" 
+                  type="password" 
+                  placeholder="Re-type your password" 
+                  class="w-full p-3 pr-10 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
+                />
+                <button 
+                  type="button" 
+                  onclick="togglePasswordVisibility('auth-confirm-password-input', this)" 
+                  class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 text-sm"
+                  title="Toggle password visibility"
+                >
+                  👁️
+                </button>
+              </div>
+            </div>
+
+            <!-- Remember Me checkbox -->
+            <div id="auth-remember-row" class="flex items-center justify-between text-xs text-slate-600 pt-1">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="auth-remember-me" checked class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300" />
+                <span>Remember my credentials</span>
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button 
+              type="submit" 
+              id="auth-submit-btn" 
+              class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/20 transition-all interactive-press"
+            >
+              Sign In to LinguaFlow
+            </button>
+          </form>
+
+          <form id="phone-auth-form" onsubmit="handlePhoneAuthFormSubmit(event)" autocomplete="off" class="hidden space-y-4">
+            <div id="phone-name-container" class="hidden">
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1" for="auth-phone-name-input">Full Name</label>
+              <input id="auth-phone-name-input" type="text" placeholder="Enter your full name" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1" for="auth-phone-input">Phone Number</label>
+              <input id="auth-phone-input" type="tel" inputmode="tel" autocomplete="tel" placeholder="+91 9876543210" required class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+              <p class="text-[11px] text-slate-500 mt-1">Include your country code, for example +91.</p>
+            </div>
+            <div id="phone-recaptcha-container"></div>
+            <div id="phone-code-container" class="hidden">
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1" for="auth-phone-code-input">Verification Code</label>
+              <input id="auth-phone-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Enter the 6-digit code" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+            </div>
+            <button type="submit" id="phone-send-code-btn" class="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/20 transition-all interactive-press">Send Verification Code</button>
+            <button type="button" id="phone-confirm-code-btn" onclick="confirmPhoneCode()" class="hidden w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all interactive-press">Verify and Continue</button>
+          </form>
+
+          <!-- Academic Evaluation Guest Banner -->
+          <div class="mt-8 pt-6 border-t border-slate-200">
+            <div class="p-4 rounded-2xl bg-amber-50/80 border border-amber-200/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div>
+                <div class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                  <span>🎓 Professor & Evaluator Mode</span>
+                </div>
+                <p class="text-[11px] text-amber-700 mt-0.5">Test all features instantly with 1 click without credentials.</p>
+              </div>
+              <button 
+                type="button" 
+                onclick="continueAsGuest()" 
+                class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-sm transition-all whitespace-nowrap interactive-press"
+              >
+                1-Click Guest Login &rarr;
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-white border-t border-slate-200 mt-auto py-6 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div>
+        <strong>LinguaFlow</strong> &bull; Human-Computer Interaction Academic Project Showcase
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="showScreen('screen-database')" class="text-indigo-600 font-semibold hover:underline">Database Studio</button>
+        <span>&bull;</span>
+        <button id="guest-mode-footer" onclick="continueAsGuest()" class="hidden text-slate-600 font-semibold hover:underline">Guest Mode</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL: INLINE DATABASE RECORD EDIT ==================== -->
+  <div id="db-edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="db-edit-modal-title" class="text-base font-bold text-slate-900">Edit Record</h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+      
+      <form id="db-edit-form" class="max-h-[60vh] overflow-y-auto custom-scrollbar pr-1">
+        <!-- Injected dynamically -->
+      </form>
+
+      <div class="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-slate-100">
+        <button type="button" onclick="closeEditModal()" class="px-4 py-2 rounded-lg bg-slate-100 text-slate-600 text-xs font-semibold hover:bg-slate-200">Cancel</button>
+        <button type="button" onclick="saveEditModalRecord(event)" class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: ADD VOCABULARY WORD ==================== -->
+  <div id="db-add-word-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-slate-900">Add New Word to Database</h3>
+        <button onclick="closeAddWordModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+
+      <form onsubmit="handleAddWordSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Language</label>
+          <select id="add-language-select" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs">
+            <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
+            <option value="Hindi">Hindi (हिन्दी)</option>
+            <option value="English">English</option>
+            <option value="Tamil">Tamil (தமிழ்)</option>
+            <option value="Telugu">Telugu (తెలుగు)</option>
+            <option value="Malayalam">Malayalam (മലയാളം)</option>
+            <option value="Marathi">Marathi (मराठी)</option>
+            <option value="Bengali">Bengali (বাংলা)</option>
+            <option value="Gujarati">Gujarati (ગુજરાતી)</option>
+            <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+            <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
+            <option value="Urdu">Urdu (اردو)</option>
+            <option value="Sanskrit">Sanskrit (संस्कृतम्)</option>
+            <option value="Assamese">Assamese (অসমীয়া)</option>
+            <option value="Spanish">Spanish</option>
+            <option value="French">French</option>
+            <option value="German">German</option>
+            <option value="Japanese">Japanese</option>
+            <option value="Italian">Italian</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Target Word</label>
+          <input id="add-word-input" type="text" placeholder="e.g. Buenas noches" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">English Translation</label>
+          <input id="add-translation-input" type="text" placeholder="e.g. Good night" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Phonetic Guide</label>
+          <input id="add-phonetic-input" type="text" placeholder="e.g. BWEH-nahs NOH-chehs" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Category</label>
+          <input id="add-category-input" type="text" placeholder="e.g. Greetings / Food" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs" />
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3">
+          <button type="button" onclick="closeAddWordModal()" class="px-4 py-2 rounded-lg bg-slate-100 text-slate-600 text-xs font-semibold">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700">Add to Database</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: GOOGLE OAUTH SIMULATOR (GMAIL) ==================== -->
+  <div id="google-oauth-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200">
+      
+      <!-- Google Logo & Title -->
+      <div class="text-center mb-6">
+        <svg class="w-8 h-8 mx-auto mb-2" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <h3 class="text-xl font-bold text-slate-800">Sign in with Google</h3>
+        <p class="text-xs text-slate-500 mt-1">Enter your Google / Gmail account credentials</p>
+      </div>
+
+      <!-- Real Google Sign-in Input Form -->
+      <form id="google-login-form" onsubmit="handleGoogleFormSubmit(event)" class="space-y-3 mb-6">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Your Full Name</label>
+          <input 
+            id="google-input-name" 
+            type="text" 
+            placeholder="e.g. Pavan Basavaraj" 
+            required 
+            class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Gmail / Google Email</label>
+          <input 
+            id="google-input-email" 
+            type="email" 
+            placeholder="youremail@gmail.com" 
+            required 
+            class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-800 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" 
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md transition-colors flex items-center justify-center gap-2"
+        >
+          <span>Continue with this Google Account</span>
+          <span>&rarr;</span>
+        </button>
+      </form>
+
+      <!-- Recent Accounts List (if available in database) -->
+      <div id="google-saved-accounts" class="pt-2 border-t border-slate-100">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Or choose from previously used:</div>
+        <div id="google-accounts-chips" class="space-y-1.5">
+          <!-- Dynamically populated from database users -->
+        </div>
+      </div>
+
+      <!-- Spinner / Connecting State (Hidden by default) -->
+      <div id="google-loading-state" class="hidden text-center py-6">
+        <div class="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-3"></div>
+        <div class="text-xs font-bold text-slate-700">Verifying with Google Identity Services...</div>
+        <p class="text-[10px] text-slate-400 mt-1">Connecting OAuth 2.0 token to database</p>
+      </div>
+
+      <!-- Footer / Cancel -->
+      <div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs">
+        <span class="text-slate-400 text-[11px]">Protected by Google OAuth</span>
+        <button type="button" onclick="closeGoogleOAuthModal()" class="px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-100 font-semibold">
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: FACEBOOK OAUTH SIMULATOR ==================== -->
+  <div id="fb-oauth-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200">
+      
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 bg-[#1877F2] rounded-full flex items-center justify-center mx-auto mb-3 shadow">
+          <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900">Log in with Facebook</h3>
+        <p class="text-xs text-slate-500 mt-1">LinguaFlow is requesting access to your public profile and email.</p>
+      </div>
+
+      <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 mb-6 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center">
+          👤
+        </div>
+        <div class="flex-1 text-xs">
+          <div class="font-bold text-slate-800">Facebook User Account</div>
+          <div class="text-slate-500 text-[11px]">facebook.user@fbmail.com</div>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button 
+          type="button" 
+          onclick="closeFacebookOAuthModal()" 
+          class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+        >
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          onclick="confirmFacebookOAuthLogin()" 
+          class="flex-1 py-2.5 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold shadow transition-colors"
+        >
+          Continue as Facebook User
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: FORGOT PASSWORD ==================== -->
+  <div id="forgot-password-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200">
+      
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-slate-900">Reset Password</h3>
+        <button onclick="closeForgotPasswordModal()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+
+      <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+        Enter the email address associated with your LinguaFlow account, and we will send a password reset verification link.
+      </p>
+
+      <form onsubmit="handleForgotPasswordSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Your Email Address</label>
+          <input 
+            id="forgot-email-input" 
+            type="email" 
+            placeholder="name@gmail.com" 
+            required 
+            class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 focus:bg-white focus:border-indigo-500" 
+          />
+        </div>
+
+        <div id="forgot-feedback-alert" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
+          ✓ Password reset instructions have been dispatched to your email!
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" onclick="closeForgotPasswordModal()" class="px-4 py-2 rounded-lg bg-slate-100 text-slate-600 text-xs font-semibold hover:bg-slate-200">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700">
+            Send Reset Link
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION (HCI: Immediate Feedback) ==================== -->
+  <div id="db-toast" class="fixed bottom-6 right-6 z-50 translate-y-24 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-700 text-xs font-semibold">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span id="db-toast-msg">Activity logged to database</span>
+  </div>
+
+  <!-- Firebase browser SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js?v=20260912"></script>
+
+  <!-- Application Logic & Database Engine -->
+  <script src="database.js?v=20260912"></script>
+  <script src="app.js?v=20260912"></script>
+</body>
+</html>
