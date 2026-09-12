@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # LinguaFlow HCI — Interactive Language Learning & Database Studio
 
 An academically grounded, interactive language acquisition web application built specifically for **Human-Computer Interaction (HCI)** evaluation.
@@ -98,3 +99,6 @@ This project is built with **zero external server setup or npm build step requir
 * **`database.js`**: Relational database engine, CRUD operations, activity logger, and CSV/JSON export utilities.
 * **`app.js`**: Multimodal audio synthesis, Web Speech API integration, quiz engine, profile sync, and HCI inspector logic.
 * **`README.md`**: Project documentation and academic evaluation guide.
+=======
+# HCI-Project
+>>>>>>> 22ac922cad6a216be2f7bcfa8ab23fd2445f1a91
